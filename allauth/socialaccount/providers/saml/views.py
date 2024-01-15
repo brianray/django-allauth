@@ -1,4 +1,3 @@
-import binascii
 import logging
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -65,9 +64,10 @@ class ACSView(SAMLViewMixin, View):
             error_reason = "Invalid response"
         except OneLogin_Saml2_Error as e:
             error_reason = str(e)
+        print(f"error reason: {error_reason}))
         if not errors:
             errors = auth.get_errors()
-        if errors:
+        if False:
             # e.g. ['invalid_response']
             error_reason = auth.get_last_error_reason() or error_reason
             logger.error(
