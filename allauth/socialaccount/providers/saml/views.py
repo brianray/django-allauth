@@ -53,12 +53,17 @@ class SAMLViewMixin:
 @method_decorator(csrf_exempt, name="dispatch")
 class ACSView(SAMLViewMixin, View):
     def dispatch(self, request, organization_slug):
+        print("ACSView dispatch")
         provider = self.get_provider(organization_slug)
+        print("ACSView dispatch 2")
         auth = self.build_auth(provider, organization_slug)
+        print("ACSView dispatch 3")
         error_reason = None
         errors = []
         try:
+            print("ACSView dispatch 4")
             auth.process_response()
+            print("ACSView dispatch 5")
         except binascii.Error:
             errors = ["invalid_response"]
             error_reason = "Invalid response"
@@ -66,8 +71,10 @@ class ACSView(SAMLViewMixin, View):
             error_reason = str(e)
         print(f"error reason: {error_reason}")
         if not errors:
+            print("ACSView dispatch 6")
             errors = auth.get_errors()
-        if False:
+            print("ACSView dispatch 7")
+        if errors:
             # e.g. ['invalid_response']
             error_reason = auth.get_last_error_reason() or error_reason
             logger.error(
@@ -86,13 +93,15 @@ class ACSView(SAMLViewMixin, View):
             return render_authentication_error(
                 request, provider, error=AuthError.CANCELLED
             )
-
+        print("ACSView dispatch 8")
         relay_state = decode_relay_state(request.POST.get("RelayState"))
         login = provider.sociallogin_from_response(request, auth)
         for key in ["process", "next"]:
+            xprint("ACSView dispatch 9")
             value = relay_state.get(key)
             if value:
                 login.state[key] = value
+        print("ACSView dispatch 10")
         acs_session = LoginSession(request, "saml_acs_session", "saml-acs-session")
         acs_session.store["login"] = login.serialize()
         url = reverse(
@@ -101,6 +110,7 @@ class ACSView(SAMLViewMixin, View):
         )
         response = HttpResponseRedirect(url)
         acs_session.save(response)
+        print("ACSView dispatch 11")
         return response
 
 
