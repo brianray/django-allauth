@@ -97,7 +97,7 @@ class ACSView(SAMLViewMixin, View):
         relay_state = decode_relay_state(request.POST.get("RelayState"))
         login = provider.sociallogin_from_response(request, auth)
         for key in ["process", "next"]:
-            xprint("ACSView dispatch 9")
+            print("ACSView dispatch 9")
             value = relay_state.get(key)
             if value:
                 login.state[key] = value
